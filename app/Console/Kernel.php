@@ -12,7 +12,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        $schedule->command('leads:update-statuses')->hourly();
+        $schedule->command('leads:check-and-send')->everyMinute();
     }
 
     /**
