@@ -14,7 +14,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return ['Laravel' => app()->version()];
+    return phpinfo();
+});
+Route::post('/', function () {
+    return response()->noContent();
 });
 
 require __DIR__.'/auth.php';
