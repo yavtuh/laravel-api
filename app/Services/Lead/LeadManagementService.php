@@ -38,7 +38,9 @@ class LeadManagementService implements LeadManagementServiceContract
             $user = $this->userService->findByKey($data);
             $funnel = $this->funnelService->findByName($data);
             $lead = $this->leadRepository->create($this->updateArray($data, $user, $funnel));
-            $this->crmSendService->dispatchLead($funnel, $lead);
+//            $this->crmSendService->dispatchLead($funnel, $lead);
+            $crm = Crm::find(3);
+            $this->crmSendService->send($crm, $lead);
             DB::commit();
             return true;
         } catch (\Exception $e) {

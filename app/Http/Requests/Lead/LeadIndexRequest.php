@@ -31,8 +31,10 @@ class LeadIndexRequest extends FormRequest
             'buyer' => 'nullable|string',
             'leadStatus' => 'nullable|string',
             'sentStatus' => 'nullable|string',
+            'sentResult' => 'nullable|string',
             'domain' => 'nullable|string',
             'crm' => 'nullable|string',
+            'utm' => 'nullable|string',
 
         ];
     }

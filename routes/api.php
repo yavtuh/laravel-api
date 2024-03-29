@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::post('lead/create', [\App\Http\Controllers\Api\V1\Lead\LeadController::class, 'store'])->middleware('api_key');
+Route::post('lead/create', [\App\Http\Controllers\Api\V1\Lead\LeadController::class, 'store'])->middleware(['api_key']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         return new App\Http\Resources\User\UserResource($request->user());

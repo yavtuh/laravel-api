@@ -51,7 +51,7 @@ class CrmStatusService implements Contracts\CrmStatusServiceContract
         })->toArray();
     }
 
-    private function sendRequestToCrm(Collection $crm, Carbon $startDate, Carbon $endDate)
+    private function sendRequestToCrm(Crm $crm, Carbon $startDate, Carbon $endDate)
     {
         $statusLead = $crm->statusLead;
         $headers = $this->crmHeaderService->headers($crm->headers);

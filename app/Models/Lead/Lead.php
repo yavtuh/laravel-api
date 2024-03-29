@@ -62,4 +62,13 @@ class Lead extends Model
         return $this->belongsTo(Funnel::class);
     }
 
+    public function scopeOfCurrentUser($query)
+    {
+        if (auth()->check() && !auth()->user()->hasRole('admin')) {
+            return $query->where('user_id', auth()->id());
+        }
+
+        return $query;
+    }
+
 }

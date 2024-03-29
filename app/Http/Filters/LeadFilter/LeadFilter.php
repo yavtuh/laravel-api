@@ -20,6 +20,8 @@ class LeadFilter extends AbstractFilter
 
     public const DOMAIN = 'domain';
     public const CRM = 'crm';
+    public const SENTRESULT = 'sentResult';
+    public const UTM = 'utm';
 
     protected function getCallbacks(): array
     {
@@ -35,6 +37,8 @@ class LeadFilter extends AbstractFilter
             self::SENTSTATUS => [$this, 'sentStatus'],
             self::DOMAIN => [$this, 'domain'],
             self::CRM => [$this, 'crm'],
+            self::SENTRESULT => [$this, 'sentResult'],
+            self::UTM => [$this, 'utm'],
         ];
     }
 
@@ -83,11 +87,22 @@ class LeadFilter extends AbstractFilter
         return $builder->where('send_status', $value);
     }
 
+    public function sentResult(Builder $builder, $value){
+        if($value === 'Неопределённый'){
+            return $builder->whereNull('send_result');
+        }
+        return $builder->where('send_result', $value);
+    }
+
     public function domain(Builder $builder, $value){
         return $builder->where('domain', $value);
     }
 
     public function crm(Builder $builder, $value){
         return $builder->where('crm_id', $value);
+    }
+
+    public function utm(Builder $builder, $value){
+        return $builder->where('utm', 'LIKE', "%{$value}%");
     }
 }

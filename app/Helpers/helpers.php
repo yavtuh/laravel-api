@@ -38,3 +38,19 @@ if (!function_exists('get_value_by_path')) {
         return $array;
     }
 }
+
+if (!function_exists('check_value')) {
+    function check_value($value, $expected) {
+
+        if (is_bool($expected)) {
+
+            return $value === $expected;
+        }
+
+        if (is_string($expected) && is_string($value)) {
+            return str_contains($expected, $value);
+        }
+
+        return false;
+    }
+}

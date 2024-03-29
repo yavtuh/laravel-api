@@ -38,7 +38,6 @@ class LeadGenerateService implements Contracts\LeadGenerateServiceContract
                 return $userAgent;
             case 'country':
                 $country = $this->generateCountry($lead);
-                dd($country);
                 $this->leadRepository->update(['country' => $country], $lead);
                 return $country;
             case 'domain':
