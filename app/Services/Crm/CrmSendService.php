@@ -72,6 +72,7 @@ class CrmSendService implements Contracts\CrmSendServiceContract
         $createLead = $crm->createLead;
         $headers = $this->crmHeaderService->headers($crm->headers);
         $data = $this->createFields($createLead->fields, $lead);
+        dd($data, $lead);
         $client = new Client();
 
         return $client->request($createLead['method'], $createLead['base_url'], [
@@ -104,7 +105,7 @@ class CrmSendService implements Contracts\CrmSendServiceContract
             $sentCrms[] = $crm->id;
         }
 
-        $uuid = get_value_by_path($content, $crm->createLead->uuid);
+        $uuid = get_value_by_path($content, $crm->createLead->uuid_path);
 
         $existingResponses = json_decode($lead->response, true) ?? [];
 
@@ -126,6 +127,20 @@ class CrmSendService implements Contracts\CrmSendServiceContract
     public function createFields(Collection $fields, Lead $lead): array
     {
         return $fields->mapWithKeys(function ($field) use ($lead) {
+            if($field->is_random){
+                if($field['field_type'] === 'string'){
+                    $rand = substr(str_shuffle(str_repeat($x='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', ceil(15/strlen($x)) )),1,10);
+                    $this->leadRepository->update(['uuid' => $rand], $lead);
+                    return [$field['remote_field'] => cast_value($rand, $field['field_type'])];
+                }
+                $randomNumber = '';
+                $randomNumber .= rand(1, 9);
+                for ($i = 0; $i < 14; $i++) {
+                    $randomNumber .= rand(0, 9);
+                }
+                $this->leadRepository->update(['uuid' => $randomNumber], $lead);
+                return [$field['remote_field'] => cast_value($randomNumber, $field['field_type'])];
+            }
 
             if (is_null($field['local_field'])) {
                 return [$field['remote_field'] => cast_value($field['another_value'], $field['field_type'])];
@@ -147,7 +162,7 @@ class CrmSendService implements Contracts\CrmSendServiceContract
         foreach ($crmResponses as $crmResponse) {
             $expectedValue = get_value_by_path($response, $crmResponse['response_path']);
 
-            if (!is_null($expectedValue) && $expectedValue === cast_value($crmResponse['expected_value'], $crmResponse['expected_type'])) {
+            if (!is_null($expectedValue) && check_value(cast_value($crmResponse['expected_value'], $crmResponse['expected_type']), $expectedValue)) {
                 $statuses[] = $crmResponse['response_type'];
             } elseif ($crmResponse->is_empty && empty($response)) {
                 $statuses[] = $crmResponse['response_type'];

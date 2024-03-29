@@ -67,5 +67,6 @@ class Kernel extends HttpKernel
         'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
         'role' => \Spatie\Permission\Middlewares\RoleMiddleware::class,
         'api_key' => \App\Http\Middleware\ApiKey::class,
+        'rate_limit' => \App\Http\Middleware\RateLimitMiddleware::class,
     ];
 }

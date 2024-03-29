@@ -22,6 +22,7 @@ class CrmCreateLeadsResource extends JsonResource
             'field_type' => $this->field_type,
             'another_value' => $this->another_value,
             'is_required' => $this->is_required,
+            'is_random' => $this->is_random,
         ];
     }
 }
