@@ -19,11 +19,17 @@ class CrmCreateField extends Model
         'field_type',
         'another_value',
         'is_required',
+        'is_random',
     ];
 
     public function getIsRequiredAttribute(): bool
     {
         return $this->attributes['is_required'] === 1;
+    }
+
+    public function getIsRandomAttribute(): bool
+    {
+        return $this->attributes['is_random'] === 1;
     }
 
     public function createLead(): BelongsTo

@@ -7,6 +7,7 @@ use App\Http\Filters\LeadFilter\LeadFilter;
 use App\Http\Requests\Lead\LeadIndexRequest;
 use App\Http\Requests\Lead\LeadSentRequest;
 use App\Http\Requests\Lead\LeadStoreRequest;
+use App\Http\Resources\Lead\LeadBuyerResource;
 use App\Http\Resources\Lead\LeadResource;
 use App\Models\Crm\Crm;
 use App\Models\Funnel\Funnel;
@@ -14,7 +15,6 @@ use App\Models\Lead\Lead;
 use App\Models\User;
 use App\Services\Lead\LeadManagementService;
 use Illuminate\Http\Request;
-use Ramsey\Collection\Collection;
 
 class LeadController extends Controller
 {
@@ -27,7 +27,12 @@ class LeadController extends Controller
     {
         $data = $request->validated();
         $filterLead = app()->make(LeadFilter::class, ['queryParams' => array_filter($data)]);
-        $leads = Lead::filter($filterLead)->latest()->paginate(50);
+        $leads = Lead::ofCurrentUser()->filter($filterLead)->latest()->paginate(50);
+
+        if (!auth()->user()->hasRole('admin')) {
+            return LeadBuyerResource::collection($leads);
+        }
+
         return LeadResource::collection($leads);
     }
 
@@ -35,21 +40,22 @@ class LeadController extends Controller
     {
         $buyers = User::role('buyer')->select('id', 'name')->get();
         $funnels = Funnel::select('id', 'name')->get();
-        $crms = Crm::whereHas('settings', function ($query) {
-            $query->where('is_active', true);
-        })->select('id', 'name')->get();
+        $crms = Crm::select('id', 'name')->get();
         $leadStatuses = Lead::query()->pluck('lead_status')->unique()->map(function ($item) {
             return $item === null ? 'Неопределённый' : $item;
         })->values()->toArray();
         $sentStatuses = Lead::query()->pluck('send_status')->unique()->map(function ($item) {
             return $item === null ? 'Неопределённый' : $item;
         })->values()->toArray();
-
+        $sendResult = Lead::query()->pluck('send_result')->unique()->map(function ($item) {
+            return $item === null ? 'Неопределённый' : $item;
+        })->values()->toArray();
         return response()->json([
             'buyers' => $buyers,
             'funnels' => $funnels,
             'leadStatuses' => $leadStatuses,
             'sentStatuses' => $sentStatuses,
+            'sendResult' => $sendResult,
             'crms' => $crms
         ]);
     }
